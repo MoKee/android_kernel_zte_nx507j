@@ -2,6 +2,7 @@
 
 # Assume no targets will be supported
 WLAN_CHIPSET :=
+
 # Build/Package options for 8960 target
 ifeq ($(TARGET_BOARD_PLATFORM),msm8960)
 WLAN_CHIPSET := prima
@@ -48,7 +49,9 @@ ifeq ($(WLAN_PROPRIETARY),0)
 $(shell mkdir -p $(TARGET_OUT_ETC)/firmware/wlan/prima)
 $(shell rm -f $(TARGET_OUT_ETC)/firmware/wlan/prima/WCNSS_cfg.dat)
 $(shell cp $(LOCAL_PATH)/firmware_bin/WCNSS_cfg.dat $(TARGET_OUT_ETC)/firmware/wlan/prima)
+
 else
+
 include $(CLEAR_VARS)
 LOCAL_MODULE       := WCNSS_qcom_wlan_nv.bin
 LOCAL_MODULE_TAGS  := optional
@@ -105,7 +108,6 @@ include $(DLKM_DIR)/AndroidKernelModule.mk
 $(shell mkdir -p $(TARGET_OUT)/lib/modules; \
         ln -sf /system/lib/modules/$(WLAN_CHIPSET)/$(WLAN_CHIPSET)_wlan.ko \
                $(TARGET_OUT)/lib/modules/wlan.ko)
-
 
 endif # DLKM check
 
