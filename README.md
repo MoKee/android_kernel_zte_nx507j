@@ -1,1 +1,1 @@
-# android_kernel_nubia_nx505j 
+# android_kernel_nubia_nx507j 
