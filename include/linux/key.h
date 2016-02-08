@@ -126,7 +126,7 @@ struct key {
 	key_serial_t		serial;		/* key serial number */
 	union {
 		struct list_head graveyard_link;
-	struct rb_node		serial_node;
+		struct rb_node	serial_node;
 	};
 	struct key_type		*type;		/* type of key */
 	struct rw_semaphore	sem;		/* change vs change sem */

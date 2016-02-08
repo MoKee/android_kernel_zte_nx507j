@@ -1155,9 +1155,6 @@ _modinst_post: _modinst_
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modinst
 	$(call cmd,depmod)
 
-
-
-
 else # CONFIG_MODULES
 
 # Modules not configured
