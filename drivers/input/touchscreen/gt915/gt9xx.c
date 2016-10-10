@@ -684,6 +684,39 @@ static ssize_t ztemt_wakeup_gesture_store(struct device *dev,
 static DEVICE_ATTR(wakeup_gesture, 0664, ztemt_wakeup_gesture_show, ztemt_wakeup_gesture_store);
 /*luochangyang END*/
 
+static ssize_t ztemt_keypad_enable_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct i2c_client *client = container_of(dev, struct i2c_client, dev);
+	struct goodix_ts_data *ts = i2c_get_clientdata(client);
+	ssize_t ret;
+
+	ret = sprintf(buf, "0x%02X\n", ts->keypad_enable);
+
+	return ret;
+}
+
+static ssize_t ztemt_keypad_enable_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t size)
+{
+	struct i2c_client *client = container_of(dev, struct i2c_client, dev);
+	struct goodix_ts_data *ts = i2c_get_clientdata(client);
+	unsigned long value;
+	int ret;
+
+	ret = kstrtoul(buf, 10, &value);
+	if (ret < 0)
+		return ret;
+
+	if (value > 0)
+		value = 1;
+
+	ts->keypad_enable = (u8)value;
+
+	return size;
+}
+
+static DEVICE_ATTR(keypad_enable, 0664, ztemt_keypad_enable_show, ztemt_keypad_enable_store);
 
 /*******************************************************
 Function:
@@ -1038,7 +1071,8 @@ static void goodix_ts_work_func(struct work_struct *work)
                     }
                 }
             #endif
-                input_report_key(ts->input_dev, touch_key_array[i], key_value & (0x01<<i));   
+                if (ts->keypad_enable)
+                    input_report_key(ts->input_dev, touch_key_array[i], key_value & (0x01<<i));   
             }
             touch_num = 0;  // shield fingers
         }
@@ -2866,6 +2900,12 @@ static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id
 	ts->wakeup_gesture = 0;
 #endif
 	/*luochangyang END*/
+
+	ret = device_create_file(&(client->dev), &dev_attr_keypad_enable);
+	if (ret) {
+		dev_err(&(client->dev), "%s: Error, could not create keypad_enable", __func__);
+	}
+	ts->keypad_enable = 1;
 
 #if GTP_CREATE_WR_NODE
     init_wr_node(client);
